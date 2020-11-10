@@ -8,8 +8,15 @@ class CreateTransactionService {
     this.transactionsRepository = transactionsRepository;
   }
 
-  public execute(): Transaction {
-    // TODO
+  public execute(newTransaction: Omit<Transaction, 'id'>): Transaction {
+    if (newTransaction.type === 'outcome') {
+      const balance = this.transactionsRepository.getBalance();
+      if (balance.total < newTransaction.value) {
+        throw Error('The current balance is lower than the value asked');
+      }
+    }
+    const created = this.transactionsRepository.create(newTransaction);
+    return created;
   }
 }
 
